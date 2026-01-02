@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is used by the publish/package process of your Web project. You can customize the behavior of this process
+by editing this MSBuild file. In order to learn more about this please visit https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project>
+  <PropertyGroup>
+    <History>True|2025-10-23T07:16:25.8841472Z||;True|2025-10-22T12:26:39.2130771+03:00||;True|2025-10-22T11:53:28.1560189+03:00||;True|2025-10-22T11:33:26.5390466+03:00||;True|2025-10-22T11:26:14.7305449+03:00||;True|2025-10-22T11:06:26.2548503+03:00||;True|2025-10-22T10:39:09.0255444+03:00||;True|2025-10-22T09:31:57.4745751+03:00||;False|2025-10-22T09:30:54.0597033+03:00||;False|2025-10-22T09:30:28.8512681+03:00||;True|2025-10-21T17:26:57.5198051+03:00||;True|2025-10-21T17:10:10.7728260+03:00||;True|2025-10-21T17:08:51.9733989+03:00||;</History>
+    <LastFailureDetails />
+    <_PublishTargetUrl>C:\Users\user\Desktop\studentAPI</_PublishTargetUrl>
+  </PropertyGroup>
+</Project>

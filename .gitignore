@@ -52,3 +52,9 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+
+
+CGeneralFunctions.cs
+get_role_student_api.sql
+student_teacher_api_query.sql
