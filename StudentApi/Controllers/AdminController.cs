@@ -151,34 +151,34 @@ namespace StudentApi.Controllers
 
         #region Role Management Endpoints
 
-        [HttpPost]
-        public async Task<ActionResult<List<RoleDTO>>> GetRoles()
-        {
-            try
-            {
-                var connStr = GetConnectionString();
-                var dt = CRole.SelectAllDT_Odbc(null, connStr);
+        //[HttpPost]
+        //public async Task<ActionResult<List<RoleDTO>>> GetRoles()
+        //{
+        //    try
+        //    {
+        //        var connStr = GetConnectionString();
+        //        var dt = CRole.SelectAllDT_Odbc(null, connStr);
 
-                var roleDtos = new List<RoleDTO>();
-                foreach (DataRow row in dt.Rows)
-                {
-                    roleDtos.Add(new RoleDTO
-                    {
-                        Id = Convert.ToInt32(row["Id"]),
-                        RoleName = row["RoleName"]?.ToString() ?? string.Empty,
-                        Description = row["Description"]?.ToString() ?? string.Empty
-                    });
-                }
+        //        var roleDtos = new List<RoleDTO>();
+        //        foreach (DataRow row in dt.Rows)
+        //        {
+        //            roleDtos.Add(new RoleDTO
+        //            {
+        //                Id = Convert.ToInt32(row["Id"]),
+        //                RoleName = row["RoleName"]?.ToString() ?? string.Empty,
+        //                Description = row["Description"]?.ToString() ?? string.Empty
+        //            });
+        //        }
 
-                await LogEvent("Retrieved roles list", "Admin/GetRoles", "Info");
-                return Ok(roleDtos);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving roles");
-                return StatusCode(500, new { message = "An error occurred while retrieving roles" });
-            }
-        }
+        //        await LogEvent("Retrieved roles list", "Admin/GetRoles", "Info");
+        //        return Ok(roleDtos);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error retrieving roles");
+        //        return StatusCode(500, new { message = "An error occurred while retrieving roles" });
+        //    }
+        //}
 
         [HttpPost]
         public async Task<ActionResult> CreateRole([FromBody] RoleInsertDTO request)

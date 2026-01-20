@@ -1,16 +1,17 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Authorization;
 using StudentApi.Attributes;
 using StudentApi.Services;
 using System.Security.Claims;
 
 namespace StudentApi.Middleware
 {
-    public class DynamicAuthorizationMiddleware
+    public class Permission_Authorization_Middleware
     {
         private readonly RequestDelegate _next;
-        private readonly ILogger<DynamicAuthorizationMiddleware> _logger;
+        private readonly ILogger<Permission_Authorization_Middleware> _logger;
 
-        public DynamicAuthorizationMiddleware(RequestDelegate next, ILogger<DynamicAuthorizationMiddleware> logger)
+        public Permission_Authorization_Middleware(RequestDelegate next, ILogger<Permission_Authorization_Middleware> logger)
         {
             _next = next;
             _logger = logger;
@@ -21,11 +22,11 @@ namespace StudentApi.Middleware
             var endpoint = context.GetEndpoint();
 
             // Skip authorization for AllowAnonymous endpoints
-            if (endpoint?.Metadata.GetMetadata<AllowAnonymousAttribute>() != null)
-            {
-                await _next(context);
-                return;
-            }
+            //if (endpoint?.Metadata.GetMetadata<AllowAnonymousAttribute>() != null)
+            //{
+            //    await _next(context);
+            //    return;
+            //}
 
             // Check if user is authenticated
             var user = context.User;
@@ -75,4 +76,5 @@ namespace StudentApi.Middleware
             await _next(context);
         }
     }
-}
+
+    }

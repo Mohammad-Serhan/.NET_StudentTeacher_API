@@ -1,0 +1,139 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\user\\Downloads\\technologies\\.NET\\my_projects\\.NET_StudentTeacher_API\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{BC281F84-B80B-4518-AC63-C8234CB21F91}|StudentApi\\StudentApi.csproj|c:\\users\\user\\downloads\\technologies\\.net\\my_projects\\.net_studentteacher_api\\studentapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BC281F84-B80B-4518-AC63-C8234CB21F91}|StudentApi\\StudentApi.csproj|solutionrelative:studentapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BC281F84-B80B-4518-AC63-C8234CB21F91}|StudentApi\\StudentApi.csproj|c:\\users\\user\\downloads\\technologies\\.net\\my_projects\\.net_studentteacher_api\\studentapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{BC281F84-B80B-4518-AC63-C8234CB21F91}|StudentApi\\StudentApi.csproj|solutionrelative:studentapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BC281F84-B80B-4518-AC63-C8234CB21F91}|StudentApi\\StudentApi.csproj|c:\\users\\user\\downloads\\technologies\\.net\\my_projects\\.net_studentteacher_api\\studentapi\\middleware\\clientinfomiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BC281F84-B80B-4518-AC63-C8234CB21F91}|StudentApi\\StudentApi.csproj|solutionrelative:studentapi\\middleware\\clientinfomiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BC281F84-B80B-4518-AC63-C8234CB21F91}|StudentApi\\StudentApi.csproj|c:\\users\\user\\downloads\\technologies\\.net\\my_projects\\.net_studentteacher_api\\studentapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BC281F84-B80B-4518-AC63-C8234CB21F91}|StudentApi\\StudentApi.csproj|solutionrelative:studentapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6F975E67-A824-4494-8481-8C5E52D1D69B}|Auth.Shared\\Auth.Shared.csproj|c:\\users\\user\\downloads\\technologies\\.net\\my_projects\\.net_studentteacher_api\\auth.shared\\services\\jwsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6F975E67-A824-4494-8481-8C5E52D1D69B}|Auth.Shared\\Auth.Shared.csproj|solutionrelative:auth.shared\\services\\jwsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6F975E67-A824-4494-8481-8C5E52D1D69B}|Auth.Shared\\Auth.Shared.csproj|c:\\users\\user\\downloads\\technologies\\.net\\my_projects\\.net_studentteacher_api\\auth.shared\\middleware\\jwt_check_middleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6F975E67-A824-4494-8481-8C5E52D1D69B}|Auth.Shared\\Auth.Shared.csproj|solutionrelative:auth.shared\\middleware\\jwt_check_middleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\user\\Downloads\\technologies\\.NET\\my_projects\\.NET_StudentTeacher_API\\StudentApi\\Program.cs",
+              "RelativeDocumentMoniker": "StudentApi\\Program.cs",
+              "ToolTip": "C:\\Users\\user\\Downloads\\technologies\\.NET\\my_projects\\.NET_StudentTeacher_API\\StudentApi\\Program.cs*",
+              "RelativeToolTip": "StudentApi\\Program.cs*",
+              "ViewState": "AgIAAEYAAAAAAAAAAAAAAG0AAAA0AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-02T11:16:35.058Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ClientInfoMiddleware.cs",
+              "DocumentMoniker": "C:\\Users\\user\\Downloads\\technologies\\.NET\\my_projects\\.NET_StudentTeacher_API\\StudentApi\\Middleware\\ClientInfoMiddleware.cs",
+              "RelativeDocumentMoniker": "StudentApi\\Middleware\\ClientInfoMiddleware.cs",
+              "ToolTip": "C:\\Users\\user\\Downloads\\technologies\\.NET\\my_projects\\.NET_StudentTeacher_API\\StudentApi\\Middleware\\ClientInfoMiddleware.cs",
+              "RelativeToolTip": "StudentApi\\Middleware\\ClientInfoMiddleware.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAAA1wAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-13T10:54:20.699Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "C:\\Users\\user\\Downloads\\technologies\\.NET\\my_projects\\.NET_StudentTeacher_API\\StudentApi\\Controllers\\AuthController.cs",
+              "RelativeDocumentMoniker": "StudentApi\\Controllers\\AuthController.cs",
+              "ToolTip": "C:\\Users\\user\\Downloads\\technologies\\.NET\\my_projects\\.NET_StudentTeacher_API\\StudentApi\\Controllers\\AuthController.cs",
+              "RelativeToolTip": "StudentApi\\Controllers\\AuthController.cs",
+              "ViewState": "AgIAAB8AAAAAAAAAAAAgwLkAAAAxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-13T10:52:37.094Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\user\\Downloads\\technologies\\.NET\\my_projects\\.NET_StudentTeacher_API\\StudentApi\\appsettings.json",
+              "RelativeDocumentMoniker": "StudentApi\\appsettings.json",
+              "ToolTip": "C:\\Users\\user\\Downloads\\technologies\\.NET\\my_projects\\.NET_StudentTeacher_API\\StudentApi\\appsettings.json",
+              "RelativeToolTip": "StudentApi\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-01-13T10:51:30.442Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "JwsService.cs",
+              "DocumentMoniker": "C:\\Users\\user\\Downloads\\technologies\\.NET\\my_projects\\.NET_StudentTeacher_API\\Auth.Shared\\Services\\JwsService.cs",
+              "RelativeDocumentMoniker": "Auth.Shared\\Services\\JwsService.cs",
+              "ToolTip": "C:\\Users\\user\\Downloads\\technologies\\.NET\\my_projects\\.NET_StudentTeacher_API\\Auth.Shared\\Services\\JwsService.cs",
+              "RelativeToolTip": "Auth.Shared\\Services\\JwsService.cs",
+              "ViewState": "AgIAAA4AAAAAAAAAAAAIwBoAAABmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-13T10:51:18.516Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:15:0:{2456bd12-ecf7-4988-a4a6-67d49173f565}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:13:0:{2456bd12-ecf7-4988-a4a6-67d49173f565}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{65ddf8c3-8f89-4077-a6c6-dbb8853aab13}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{99b8fa2f-ab90-4f57-9c32-949f146f1914}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Jwt_Check_Middleware.cs",
+              "DocumentMoniker": "C:\\Users\\user\\Downloads\\technologies\\.NET\\my_projects\\.NET_StudentTeacher_API\\Auth.Shared\\Middleware\\Jwt_Check_Middleware.cs",
+              "RelativeDocumentMoniker": "Auth.Shared\\Middleware\\Jwt_Check_Middleware.cs",
+              "ToolTip": "C:\\Users\\user\\Downloads\\technologies\\.NET\\my_projects\\.NET_StudentTeacher_API\\Auth.Shared\\Middleware\\Jwt_Check_Middleware.cs",
+              "RelativeToolTip": "Auth.Shared\\Middleware\\Jwt_Check_Middleware.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADoBAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-09T12:51:54.807Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

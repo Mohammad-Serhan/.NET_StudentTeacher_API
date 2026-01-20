@@ -1,7 +1,7 @@
 ﻿using Auth.Shared.DTO;
 using Auth.Shared.Models;
 
-namespace Auth.Shared.Contracts
+namespace Auth.Shared.Services
 {
     public interface IAuthService
     {

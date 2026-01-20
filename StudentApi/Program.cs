@@ -1,84 +1,87 @@
+﻿using Auth.Shared.Controllers;
+using Auth.Shared.MiddleWare;
+using Auth.Shared.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using StudentApi.Middleware;
 using StudentApi.Services;
 using System.Text;
 using System.Threading.RateLimiting;
-using IConfigService = Auth.Shared.Services.IConfigService;
-using IJwsService = Auth.Shared.Services.IJwsService;
-using ISimpleEncryptionService = Auth.Shared.Services.ISimpleEncryptionService;
 
-using Auth.Shared.Contracts;
-using Auth.Shared.Services;
-using SimpleEncryptionService = Auth.Shared.Services.SimpleEncryptionService;
-using ConfigService = Auth.Shared.Services.ConfigService;
-using JwsService = Auth.Shared.Services.JwsService;
 
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 
-
-
-
 // Add services to the container
 builder.Services.AddControllers();
-
-
 
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 
-
 // Rate Limiting
 builder.Services.AddRateLimiter(options =>
 {
-    var rateLimitOptions = new FixedWindowRateLimiterOptions
-    {
-        AutoReplenishment = true,
-        PermitLimit = 150,
-        Window = TimeSpan.FromMinutes(1)
-    };
-
+    // Global fallback policy
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
     {
         var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-        return RateLimitPartition.GetFixedWindowLimiter(ipAddress, _ => rateLimitOptions);
+        return RateLimitPartition.GetFixedWindowLimiter(ipAddress, _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 200,
+            Window = TimeSpan.FromMinutes(1),
+            AutoReplenishment = true
+        });
     });
 
+    // Named policies for different endpoints
+    options.AddFixedWindowLimiter("ModerateApiPolicy", policyOptions =>
+    {
+        policyOptions.PermitLimit = 100;
+        policyOptions.Window = TimeSpan.FromMinutes(1);
+        policyOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        policyOptions.QueueLimit = 5;
+        policyOptions.AutoReplenishment = true;
+    });
 
-    options.AddPolicy("ModerateApiPolicy", httpContext =>
-        RateLimitPartition.GetFixedWindowLimiter(
-            httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
-            _ => new FixedWindowRateLimiterOptions
-            {
-                AutoReplenishment = true,
-                PermitLimit = 150,
-                Window = TimeSpan.FromMinutes(1)
-            }));
-
+    // Custom rejection response
     options.OnRejected = async (context, token) =>
     {
         context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
-        await context.HttpContext.Response.WriteAsync("Too many requests. Please try again later.", token);
+        context.HttpContext.Response.Headers.RetryAfter =
+            ((context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter)
+                ? retryAfter : TimeSpan.FromSeconds(60)).TotalSeconds).ToString();
+
+        await context.HttpContext.Response.WriteAsJsonAsync(new
+        {
+            error = "Too many requests",
+            message = "Please try again later.",
+            retryAfterSeconds = context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retry)
+                ? retry.TotalSeconds : 60
+        }, token);
     };
 });
+
+
+
 
 // CSRF Protection
 builder.Services.AddAntiforgery(options =>
 {
-    options.HeaderName = "X-XSRF-TOKEN";
+    options.HeaderName = "X-CSRF-TOKEN";
     options.Cookie.SameSite = SameSiteMode.None; // Allow the CSRF cookie to be sent with cross-site requests
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Ensure the cookie is sent over HTTPS
 });
 
+
 // Application Services
 builder.Services.AddSingleton<ISimpleEncryptionService, SimpleEncryptionService>();
 builder.Services.AddScoped<IConfigService, ConfigService>();
-builder.Services.AddScoped<IJwsService, JwsService>();
+builder.Services.AddScoped<ITokenService, JwtService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IExportService, ExportService>();
 
@@ -100,11 +103,11 @@ builder.Services.AddCors(options =>
 });
 
 // JWT Authentication
-var jwtSecretKey = builder.Configuration["Jwt:SecretKey"]
+var jwtSecretKey = builder.Configuration["JwtSettings:Key"]
     ?? throw new InvalidOperationException("JWT SecretKey is not configured");
-var jwtIssuer = builder.Configuration["Jwt:Issuer"]
+var jwtIssuer = builder.Configuration["JwtSettings:Issuer"]
     ?? throw new InvalidOperationException("JWT Issuer is not configured");
-var jwtAudience = builder.Configuration["Jwt:Audience"]
+var jwtAudience = builder.Configuration["JwtSettings:Audience"]
     ?? throw new InvalidOperationException("JWT Audience is not configured");
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -148,30 +151,24 @@ app.UseCors("AllowReactApp");
 
 
 // Custom Middleware
-app.UseMiddleware<GlobalExceptionMiddleware>();
-app.UseMiddleware<ClientInfoMiddleware>();
+//app.UseMiddleware<GlobalExceptionMiddleware>();
+//app.UseMiddleware<ClientInfoMiddleware>();
+
+
+
 
 // Security Middleware
-app.UseAuthentication();
-app.UseAuthorization();
+app.UseAuthentication();                             // ← First: "Who are you?"
+// HttpContext.User is now populated with claims
+// JWT is decoded, user identity established
 app.UseRateLimiter(); // Apply Rate Limiting early
+
+app.UseAuthorization();
 app.UseAntiforgery(); // Place Antiforgery middleware before MapControllers
 
 
-// Dynamic Authorization (if needed)
-app.UseMiddleware<DynamicAuthorizationMiddleware>();
-
-// Security Headers Middleware
-app.Use(async (context, next) =>
-{
-    context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
-    context.Response.Headers.Append("X-Frame-Options", "DENY");
-    context.Response.Headers.Append("X-XSS-Protection", "1; mode=block");
-    context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
-
-    await next();
-});
-
+// 
+app.UseMiddleware<Jwt_Check_Middleware>();
 
 
 app.MapControllers();

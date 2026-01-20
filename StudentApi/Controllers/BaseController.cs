@@ -20,14 +20,6 @@ namespace StudentApi.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        //// Parameterless constructor for controllers that don't need these services
-        //protected BaseController()
-        //{
-        //    _configService = null;
-        //    _logger = null;
-        //}
-
-
 
         // ================= Helper =================
         protected async Task LogEvent(string description, string pageName, string severity = "Info")
@@ -36,12 +28,9 @@ namespace StudentApi.Controllers
             {
                 var conn = _configService.GetConnectionString("ODBCConnectionString");
                 // Only try to get user ID if user is authenticated
-                int? userId = null;
-                try
-                {
-                    userId = GetCurrentUserId();
-                }
-                catch (UnauthorizedAccessException)
+                int? userId =  GetCurrentUserId();
+                
+                if (userId == null)
                 {
                     // User is not authenticated - this is normal for login/logout events
                     userId = null;

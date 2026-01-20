@@ -1,157 +1,142 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
-using Auth.Shared.Classes;
-using Microsoft.Extensions.Configuration;
 
 namespace Auth.Shared.Services
 {
-    public interface IJwsService
+    public interface ITokenService
     {
-        string GenerateAccessToken(EUser user, List<string> permissions);
-        string GenerateRefreshToken(EUser user);
-        (bool isValid, ClaimsPrincipal? principal) ValidateToken(string token);
-        ClaimsPrincipal? GetPrincipalFromExpiredToken(string token);
+        string GenerateAccessToken(string userId, string username, string role);
+        string GenerateRefreshToken(string userId);
+        ClaimsPrincipal ValidateToken(string token);
+        ClaimsPrincipal ValidateAccessToken(string token);
+        ClaimsPrincipal ValidateRefreshToken(string token);
+        bool IsTokenExpiringSoon(string token, int minutes = 2);
     }
 
-    public class JwsService : IJwsService
+    public class JwtService : ITokenService
     {
         private readonly IConfiguration _configuration;
-        private readonly ILogger<JwsService> _logger;
-        private readonly byte[] _secretKey;
-        private readonly string _issuer;
-        private readonly string _audience;
+        private readonly SymmetricSecurityKey _securityKey;
 
-        public JwsService(IConfiguration configuration, ILogger<JwsService> logger)
+        public JwtService(IConfiguration configuration)
         {
             _configuration = configuration;
-            _logger = logger;
-
-            var jwtSettings = _configuration.GetSection("Jwt");
-            _secretKey = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"] ?? throw new ArgumentException("JWT SecretKey is required"));
-            _issuer = jwtSettings["Issuer"] ?? throw new ArgumentException("JWT Issuer is required");
-            _audience = jwtSettings["Audience"] ?? throw new ArgumentException("JWT Audience is required");
+            _securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]));
         }
 
-
-        public string GenerateAccessToken(EUser user, List<string> permissions)
+        public string GenerateAccessToken(string userId, string username, string role)
         {
-            if (user == null) throw new ArgumentNullException(nameof(user));
-            if (permissions == null) throw new ArgumentNullException(nameof(permissions));
-
-            var claims = new List<Claim>
-            {
-                new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new(ClaimTypes.Name, user.Username),
-                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new("token_type", "access")
-            };
-
-            claims.AddRange(permissions.Select(permission => new Claim("permissions", permission)));
-
-            return GenerateToken(claims, TimeSpan.FromMinutes(30));
-        }
-
-        public string GenerateRefreshToken(EUser user)
-        {
-            if (user == null) throw new ArgumentNullException(nameof(user));
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenExpiryMinutes = Convert.ToDouble(_configuration["CookieSettings:AccessToken:ExpiryMinutes"]);
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new("token_type", "refresh")
+                new Claim(ClaimTypes.NameIdentifier, userId),
+                new Claim(ClaimTypes.Name, username),
+                new Claim(ClaimTypes.Role, role),
+                new Claim("token_type", "access"),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            return GenerateToken(claims, TimeSpan.FromHours(3));
-        }
-
-        public (bool isValid, ClaimsPrincipal? principal) ValidateToken(string token)
-        {
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                _logger.LogWarning("Token validation failed: Token is null or empty");
-                return (false, null);
-            }
-
-            try
-            {
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var validationParams = GetTokenValidationParameters(validateLifetime: true);
-
-                var principal = tokenHandler.ValidateToken(token, validationParams, out _);
-                _logger.LogDebug("Token validation successful");
-                return (true, principal);
-            }
-            catch (SecurityTokenException ex)
-            {
-                _logger.LogWarning(ex, "Token validation failed: {Error}", ex.Message);
-                return (false, null);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Unexpected error during token validation");
-                return (false, null);
-            }
-        }
-
-        public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
-        {
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                _logger.LogWarning("Get principal from expired token failed: Token is null or empty");
-                return null;
-            }
-
-            try
-            {
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var validationParams = GetTokenValidationParameters(validateLifetime: false);
-
-                var principal = tokenHandler.ValidateToken(token, validationParams, out _);
-                _logger.LogDebug("Successfully extracted principal from expired token");
-                return principal;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Failed to get principal from expired token");
-                return null;
-            }
-        }
-
-        private string GenerateToken(IEnumerable<Claim> claims, TimeSpan expiration)
-        {
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.Add(expiration),
-                Issuer = _issuer,
-                Audience = _audience,
-                SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(_secretKey),
-                    SecurityAlgorithms.HmacSha512Signature)
+                Expires = DateTime.UtcNow.AddMinutes(tokenExpiryMinutes),
+                Issuer = _configuration["JwtSettings:Issuer"],
+                Audience = _configuration["JwtSettings:Audience"],
+                SigningCredentials = new SigningCredentials(_securityKey, SecurityAlgorithms.HmacSha256Signature)
             };
 
-            var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
 
-        private TokenValidationParameters GetTokenValidationParameters(bool validateLifetime)
+        public string GenerateRefreshToken(string userId)
         {
-            return new TokenValidationParameters
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var refreshTokenExpiryDays = Convert.ToDouble(_configuration["CookieSettings:RefreshToken:ExpiryDays"]);
+
+            var claims = new[]
             {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(_secretKey),
-                ValidateIssuer = true,
-                ValidIssuer = _issuer,
-                ValidateAudience = true,
-                ValidAudience = _audience,
-                ValidateLifetime = validateLifetime,
-                ClockSkew = TimeSpan.Zero
+                new Claim(ClaimTypes.NameIdentifier, userId),
+                new Claim("token_type", "refresh"),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddDays(refreshTokenExpiryDays),
+                Issuer = _configuration["JwtSettings:Issuer"],
+                Audience = _configuration["JwtSettings:Audience"],
+                SigningCredentials = new SigningCredentials(_securityKey, SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
+
+        public ClaimsPrincipal ValidateToken(string token)
+        {
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+
+                var validationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = _securityKey,
+                    ValidateIssuer = true,
+                    ValidIssuer = _configuration["JwtSettings:Issuer"],
+                    ValidateAudience = true,
+                    ValidAudience = _configuration["JwtSettings:Audience"],
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
+                };
+
+                return tokenHandler.ValidateToken(token, validationParameters, out _);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public ClaimsPrincipal ValidateAccessToken(string token)
+        {
+            var principal = ValidateToken(token);
+            if (principal == null) return null;
+
+            var tokenType = principal.FindFirst("token_type")?.Value;
+            return tokenType == "access" ? principal : null;
+
+        }
+
+        public ClaimsPrincipal ValidateRefreshToken(string token)
+        {
+            var principal = ValidateToken(token);
+            if (principal == null) return null;
+
+            var tokenType = principal.FindFirst("token_type")?.Value;
+            return tokenType == "refresh" ? principal : null;
+        }
+
+        public bool IsTokenExpiringSoon(string token, int minutes = 2)
+        {
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+                var timeUntilExpiry = jwtToken.ValidTo - DateTime.UtcNow;
+                return timeUntilExpiry.TotalMinutes < minutes;
+            }
+            catch
+            {
+                return true; // If can't read, treat as expired
+            }
         }
     }
 }

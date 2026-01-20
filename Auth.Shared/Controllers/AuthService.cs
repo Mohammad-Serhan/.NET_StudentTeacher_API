@@ -1,13 +1,13 @@
 ﻿using Auth.Shared.Classes;
-using Auth.Shared.Contracts;
 using Auth.Shared.DTO;
 using Auth.Shared.Models;
+using Auth.Shared.Services;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
 using System.Net.Http;
 
 
-namespace Auth.Shared.Services
+namespace Auth.Shared.Controllers
 {
 
     public class AuthService : IAuthService
@@ -15,10 +15,10 @@ namespace Auth.Shared.Services
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IAntiforgery _antiforgery;
         private readonly IConfigService _configService;
-        private readonly IJwsService _jwsService;
+        private readonly ITokenService _jwsService;
 
 
-        public AuthService(IHttpContextAccessor httpContextAccessor, IAntiforgery antiforgery, IConfigService configService, IJwsService jwsService)
+        public AuthService(IHttpContextAccessor httpContextAccessor, IAntiforgery antiforgery, IConfigService configService, ITokenService jwsService)
         {
             _httpContextAccessor = httpContextAccessor;
             _antiforgery = antiforgery;
@@ -50,6 +50,7 @@ namespace Auth.Shared.Services
             {
                 return new LoginResult { Success = false, Message = "Username or password are incorrect", StatusCode = 400 };
             }
+            Console.WriteLine(BCrypt.Net.BCrypt.HashPassword("admin"));
 
             if (!BCrypt.Net.BCrypt.Verify(dto.Password, eUser.Password))
             {
@@ -57,8 +58,8 @@ namespace Auth.Shared.Services
             }
 
             var userPermissions = CUser.GetUserPermissions((int)eUser.Id, connStr);
-            var accessToken = _jwsService.GenerateAccessToken(eUser, userPermissions);
-            var refreshToken = _jwsService.GenerateRefreshToken(eUser);
+            var accessToken = _jwsService.GenerateAccessToken(eUser.Id.ToString(), eUser.Username.ToString(), "Auth");
+            var refreshToken = _jwsService.GenerateRefreshToken(eUser.Id.ToString());
 
             SetRefreshTokenCookie(refreshToken);
 
